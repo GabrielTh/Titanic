@@ -1,0 +1,177 @@
+
+import pandas as pd
+# For .read_csv, always use header=0 when you know row 0 is the header row
+df = pd.read_csv('C:/Users/gabth/Documents/AXA/Formation data science/TITANIC/train.csv', header=0)
+
+df.describe()
+df.info()
+df = df.drop(['PassengerId'], axis=1)
+df.info()
+df.head(3)
+
+#test
+df[df['Sex']=='male'] [['Sex']].head(3)
+
+
+df['FamilySize'] = df['SibSp'] + df['Parch']
+
+
+#enlever les na des embarked et remplacer par la valeur la plus commune
+df.Embarked.describe()
+
+df[ df['Embarked'].isnull() ][['Pclass','Embarked']].head(10)
+df['EmbarkedFill']=df['Embarked']
+
+df['EmbarkedFill'][df.EmbarkedFill.isnull()] = 'S'
+df[ df['Embarked'].isnull() ][['Pclass','Embarked','EmbarkedFill']].head(10)
+
+#remplacer les valeurs alpha par des valeurs numeriques
+df['Zone'] = df['EmbarkedFill'].map( {'C': 0, 'Q': 1,'S': 2} ).astype(int)
+df[ df['Embarked'].isnull() ][['Pclass','Embarked','EmbarkedFill','Zone']].head(10)
+
+df.info()
+
+
+#CABIN
+df.Cabin.describe()
+# Replace missing values with "U0"
+df['Cabin'][df.Cabin.isnull()] = 'U0'
+
+#Age
+df.Age.describe()
+#remplacer age par la moyenne
+df['AgeFill']=df['Age']
+df['AgeFill'][df.AgeFill.isnull()] = df.Age.dropna().mean()
+df[ df['Age'].isnull() ][['Pclass','Age','AgeFill']].head(10)
+df.head(3)
+
+df.info()
+
+#transformation de alpha a numerique
+df['Gender'] = df['Sex'].map( {'female': 0, 'male': 1} ).astype(int)
+
+df.info()
+
+#on drop les variables inutiles ou pas traiter
+df = df.drop(['Name', 'Sex', 'Ticket', 'Cabin', 'Embarked','EmbarkedFill'], axis=1) 
+
+df.info()
+df = df.drop(['Age','Fare'], axis=1)
+df.info()
+df.describe()
+
+train_data = df.values
+train_data
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import pandas as pd
+# For .read_csv, always use header=0 when you know row 0 is the header row
+df = pd.read_csv('C:/Users/gabth/Documents/AXA/Formation data science/TITANIC/test.csv', header=0)
+
+df.describe()
+df.info()
+df = df.drop(['PassengerId'], axis=1)
+df.info()
+df.head(3)
+
+#test
+df[df['Sex']=='male'] [['Sex']].head(3)
+
+
+df['FamilySize'] = df['SibSp'] + df['Parch']
+
+
+#enlever les na des embarked et remplacer par la valeur la plus commune
+df.Embarked.describe()
+
+df[ df['Embarked'].isnull() ][['Pclass','Embarked']].head(10)
+df['EmbarkedFill']=df['Embarked']
+
+df['EmbarkedFill'][df.EmbarkedFill.isnull()] = 'S'
+df[ df['Embarked'].isnull() ][['Pclass','Embarked','EmbarkedFill']].head(10)
+
+#remplacer les valeurs alpha par des valeurs numeriques
+df['Zone'] = df['EmbarkedFill'].map( {'C': 0, 'Q': 1,'S': 2} ).astype(int)
+df[ df['Embarked'].isnull() ][['Pclass','Embarked','EmbarkedFill','Zone']].head(10)
+
+df.info()
+
+
+#CABIN
+df.Cabin.describe()
+# Replace missing values with "U0"
+df['Cabin'][df.Cabin.isnull()] = 'U0'
+
+#Age
+df.Age.describe()
+#remplacer age par la moyenne
+df['AgeFill']=df['Age']
+df['AgeFill'][df.AgeFill.isnull()] = df.Age.dropna().mean()
+df[ df['Age'].isnull() ][['Pclass','Age','AgeFill']].head(10)
+df.head(3)
+
+df.info()
+
+#transformation de alpha a numerique
+df['Gender'] = df['Sex'].map( {'female': 0, 'male': 1} ).astype(int)
+
+df.info()
+
+#on drop les variables inutiles ou pas traiter
+df = df.drop(['Name', 'Sex', 'Ticket', 'Cabin', 'Embarked','EmbarkedFill'], axis=1) 
+
+df.info()
+df = df.drop(['Age','Fare'], axis=1)
+df.info()
+df.describe()
+
+test_data = df.values
+test_data
+
+
+
+
+
+
+
+
+#RANDOM FOREST
+
+
+
+# Import the random forest package
+from sklearn.ensemble import RandomForestClassifier 
+
+# Create the random forest object which will include all the parameters
+# for the fit
+forest = RandomForestClassifier(n_estimators = 100)
+
+# Fit the training data to the Survived labels and create the decision trees
+forest = forest.fit(train_data[0::,1::],train_data[0::,0])
+
+
+# Take the same decision trees and run it on the test data
+output = forest.predict(test_data)
+
+
+#EXPORT
+
+import csv
+predictions_file = open("C:/Users/gabth/Documents/AXA/Formation data science/TITANIC/firstforest3.csv", "wb")
+wr = csv.writer(predictions_file, quoting=csv.QUOTE_ALL)
+wr.writerow(["PassengerId", "Survived"])
+wr.writerow(output)
+predictions_file.close()  
